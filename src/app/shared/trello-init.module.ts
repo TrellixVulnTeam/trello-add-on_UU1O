@@ -21,7 +21,7 @@ interface isInTable{
 export class Proxy implements Subject {
   private realSubject: RealSubject;
   private http!: HttpClient;
-  private url: string = "https://script.google.com/macros/s/AKfycbxl-UnMq-kCYRbocHXMHqjluhweXs5emC10p24Qcxyx7HF7DEQ/exec";
+  private url: string = GIT_GAS_URL;
   private status!: boolean;
   private data: object;
 
