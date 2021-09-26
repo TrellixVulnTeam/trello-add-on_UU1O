@@ -28,6 +28,12 @@ export class AppComponent {
         let window: any, TrelloPowerUp: any;
         var realSubject;
         var proxy: any;
+        
+        realSubject1 = new RealSubject();
+        console.log("testid");
+        proxy1 = new Proxy(realSubject1, "testid");
+        var condition1 = isBoardFirst(proxy1);
+        console.log(condition1);
 
         window.TrelloPowerUp.initialize({
             'board-buttons': (t: any) => {
