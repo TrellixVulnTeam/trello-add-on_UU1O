@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 
-interface Subject {
+export interface Subject {
   request(): void;
   secondRequest(): void;
 }
@@ -18,16 +18,23 @@ interface isInTable{
     is: boolean;
 }
 
+export interface proxy{
+  id: string;
+}
+
 export class Proxy implements Subject {
   private realSubject: RealSubject;
+  private prox!: proxy;
   private http!: HttpClient;
-  private url: string = GIT_GAS_URL;
+  private url: string;
   private status!: boolean;
-  private data: object;
+  private data: proxy;
+  private response!: any;
 
-  constructor(realSubject: RealSubject, id: string) {
+  constructor(realSubject: RealSubject, prox: any) {
       this.realSubject = realSubject;
-      this.data = {id};
+      this.data = prox;
+      this.url = "https://script.google.com/macros/s/AKfycbxl-UnMq-kCYRbocHXMHqjluhweXs5emC10p24Qcxyx7HF7DEQ/exec";
   }
 
   public request(): void {
@@ -43,14 +50,17 @@ export class Proxy implements Subject {
   }
 
   private checkAccess(): boolean {
-      this.http.get<isInTable>(this.url, this.data).subscribe(response => {
-        this.status = response.is;
-        console.log(this.status);
-        //response = JSON.stringify(response.getContentText());
-        //response.slice(response.lastIndexOf("is")).substr(2, 20).includes("true");
-      })
+      this.response = this.http.post<isInTable>(this.url, this.data);
+      //this.response = this.http.get<isInTable>(this.url+this.data.id);
+      this.status = this.response.is;
+      console.log(this.data.id);
+      console.log(this.response);
+      console.log(this.status);
+      //response = JSON.stringify(response.getContentText());
+      //response.slice(response.lastIndexOf("is")).substr(2, 20).includes("true");
       return this.status;
   }
+
 }
 
 export function isBoardFirst(subject: Subject) : any{
