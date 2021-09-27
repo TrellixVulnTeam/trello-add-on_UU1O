@@ -18,7 +18,7 @@ interface CustomWindow extends Window {
 }
 
 interface TrelloPowerUp{
-    initialize: object[];
+    initialize: any;
 }
 
 interface trellobb{
@@ -40,34 +40,17 @@ declare let window: CustomWindow;
 
 
 export class AppComponent{
-  @Input() trelloer!: any;
+  //@Input() trelloer!: any;
   title = 'AngularTrelloPowerApp';
   
     constructor() {
-        var realSubject1: Subject;
-        var proxy1: any;
-        var test1: any;
-
-        console.log(this.trelloer);
-
-        realSubject1 = new RealSubject();
-        test1 = {"id": "testid"};
-        console.log(test1.id);
-        proxy1 = new Proxy(realSubject1, test1);
-        var condition1 = isBoardFirst(proxy1);
-        console.log(condition1);
-
-        console.log("TrelloPowerUp" in window);
         var trellowind: TrelloPowerUp = window.TrelloPowerUp;
-        trellowind = this.trelloer;
         console.log(trellowind);
 
         var boardbuttons = {"board-buttons": (t: trellobb, opts: any[])=> this.BBF(t,opts)};
-        var trelloinit:object[] = trellowind.initialize;
-        trelloinit.push(boardbuttons);
-
         var showsettings = {"show-settings": (t: trelloss, opts: BoardBarOptions)=> this.SSF(t,opts)};
-        trelloinit.push(showsettings);
+        var trelloinit: any = trellowind.initialize;
+        trelloinit(boardbuttons,showsettings);
 
     }
 
