@@ -26,15 +26,16 @@ class BoardButtonBuilder implements BoardButtonsBuilder {
     public getProduct(): setBoardButtons {
         const result = this.product;
         this.reset();
+        console.log(result);
         return result;
     }
 
     public BoardButtonsCallback(): void{
-
+        alert("MMM,nice");
     }
 }
 
-interface BoardButtonHeart{
+export interface BoardButtonHeart{
     icon: object;
     text: string;
     condition: string;
@@ -71,7 +72,7 @@ export class BoardButtonDirector {
     }
 }
 
-export function BoardButtonSwitcher(director: BoardButtonDirector, condition: boolean) : void {
+export function BoardButtonSwitcher(director: BoardButtonDirector, condition: boolean) : any {
     const builder = new BoardButtonBuilder();
     director.setBuilder(builder);
 
@@ -83,5 +84,5 @@ export function BoardButtonSwitcher(director: BoardButtonDirector, condition: bo
             director.buildWithUrl();
             break;
     }
-    builder.getProduct();
+    return builder.getProduct();
 }

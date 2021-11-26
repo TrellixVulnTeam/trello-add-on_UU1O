@@ -1,0 +1,407 @@
+import { ConfigService } from "./services/initialize.service";
+
+import { BoardBarsHeart } from "./board-bar/board-bar.component";
+import { BoardButtonDirector, BoardButtonSwitcher, BoardButtonHeart } from "./shared/board-buttons";
+import { RealSubject, isBoardFirst, proxied, Proxy } from "./shared/trello-init.module";
+
+interface CustomWindow extends Window {
+    TrelloPowerUp: TrelloPowerUp;
+}
+
+interface TrelloPowerUp{
+    initialize: any;
+}
+
+interface trellobb{
+    board: any;
+}
+
+interface trelloss{
+    boardBar: any;
+}
+
+declare let window: CustomWindow;
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    providers: [ConfigService]
+})
+
+export class AppComponent{
+
+    condition!: Promise<boolean>;
+    title = 'AngularTrelloPowerApp';
+    boardbuttons: object;
+    showsettings: object;
+    trellowind: TrelloPowerUp;
+  
+    constructor(private httpService: ConfigService) {
+
+        this.trellowind = window.TrelloPowerUp;
+
+        this.boardbuttons = {
+            "board-buttons": (t: trellobb, opts: BoardButtonHeart[]) => this.BBF(t,opts)
+        };
+
+        this.showsettings = {
+            "show-settings": (t: trelloss, opts: BoardBarsHeart[]) => this.SSF(t,opts)
+        };
+
+        var trelloinit: any = this.trellowind.initialize;
+
+        trelloinit(this.boardbuttons, this.showsettings);
+
+    }
+
+    private CheckBoard = async (t: any) => {
+
+        if (this.condition === undefined){
+
+            var realSubject: RealSubject = new RealSubject();
+            
+            var bid: any = await t.board("id");
+            var id: string = bid.id;
+            console.log("id: "+id);
+        
+            var senddata = new proxied(id);
+
+            var prox: Proxy = new Proxy(realSubject, senddata, this.httpService);
+
+            this.condition = isBoardFirst(prox);
+            console.log(this.condition);
+
+        }
+
+        return this.condition;
+
+    }
+
+    private BBF = async (t: trellobb, opts: any[]) => {
+
+        var director = new BoardButtonDirector();
+
+        var cond = await this.CheckBoard(t);
+
+        return BoardButtonSwitcher( director , cond );
+        
+    };
+
+    private SSF = async (t: trelloss, opts: BoardBarsHeart[]) => {
+        
+        var cond = await this.CheckBoard(t);
+
+        /*
+        var director = new BoardButtonDirector();
+
+        var cond = await this.CheckBoard(t);
+
+        return BoardButtonSwitcher( director , cond );
+        */
+
+        
+
+    };
+  
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+import { ConfigService } from './services/initialize.service';
+//import { Proxy } from './shared/trello-init.module';
+import { HttpClientModule } from '@angular/common/http';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    StyleDirective,
+    BoardBarComponent,
+    SettingsComponent
+  ],
+  imports: [
+    AppRoutingModule,
+    BrowserModule,
+    HttpClientModule
+  ],
+  providers: [ConfigService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+/////////////////////////////////////////////////////////////////////////////
+
+import {RouterModule, Routes} from "@angular/router";
+import {BoardBarComponent} from "./board-bar/board-bar.component";
+
+const routes: Routes =[
+    {path: 'boardBar', component: BoardBarComponent}
+]
+
+@NgModule({
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule]
+})
+
+export class AppRoutingModule{
+
+
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+import { ConfigService } from "../services/initialize.service";
+
+export interface Subject {
+  request(): void;
+  secondRequest(): void;
+}
+
+export class RealSubject implements Subject {
+  public request(): boolean {
+      return true;
+  }
+  public secondRequest(): boolean{
+      return true;
+  }
+}
+
+export class proxied{
+  constructor(public id: string){
+    return {"id": this.id};
+  }
+}
+
+@NgModule({
+  providers:[ConfigService]
+})
+export class Proxy implements Subject {
+  private realSubject: RealSubject;
+  private status!: boolean;
+  private data: proxied;
+  private response!: any;
+  
+  constructor(realSubject: RealSubject, private prox: proxied, private httpService: ConfigService) {
+      this.realSubject = realSubject;
+      this.data = prox;
+  }
+  
+  public request = async () => {
+      await this.checkAccess();
+      console.log(await this.response)
+      var iser: boolean = await this.response.is;
+      console.log("i'm iser: "+iser);
+      if (iser) {
+        this.status = true;
+        console.log("i must call logaccess");
+        this.logAccess();
+        return this.realSubject.request();
+      } else { 
+        return false;
+      }
+  }
+  
+  public secondRequest(){
+    if (this.status) {
+        this.realSubject.request();
+    }
+  }
+ 
+  private checkAccess = async () => {
+      
+    console.log("hi,i'm checkAcces, my data: "+JSON.stringify(this.data));
+
+    this.response = await this.httpService.postAccess(this.data);//.then((resp:any)=>{
+      //console.log("my answer: "+JSON.stringify(resp));
+      //return resp.is;
+    //});
+      
+  }
+  
+  private logAccess(){
+  }
+
+  /*private afterFAccess(resp:any){
+    console.log("my answer: "+JSON.stringify(resp));
+    return resp.is;
+  }*/
+  
+}
+  
+export function isBoardFirst(subject: Proxy){
+  console.log(subject.request());
+  return subject.request();
+}
+  
+export function isBoard(subject: Proxy){
+  return subject.secondRequest();
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+export interface isInTable{
+  is: boolean;
+}
+
+@Injectable({
+  providedIn:  'root'
+  })
+export class ConfigService {
+  
+  private url: string;
+  private resp: any;
+  public answer!: isInTable;
+  public is!: boolean;
+  httpOptions!: object;
+  
+  constructor(private http: HttpClient) { 
+  
+    this.url = "https://script.google.com/macros/s/AKfycbxl-UnMq-kCYRbocHXMHqjluhweXs5emC10p24Qcxyx7HF7DEQ/exec";
+  
+  }
+  
+  public postAccess = async (object: object ) => {
+
+    this.resp = this.http.post<any>(this.url, JSON.stringify(object));
+    return this.resp.toPromise().then((data:isInTable) => { //toPromise not subscribe
+      this.answer = {"is": data.is};
+      console.log("answer");
+      console.log(this.answer);
+      return this.answer;
+    });
+    
+  }
+
+}
+/*
+
+const httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type':  'application/json'
+    }),
+    observe: 'response'
+};
+
+ return this.http.post('http://localhost:3000/api/Users/login', data, httpOptions)
+   .do( function(resp) {
+        self.setSession(resp);
+ });
+
+*/
+
+//export function getConfigAccess(id: string): any{
+//  return new ConfigService(http).postAccess(id);
+//}
+
+/*
+
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {Injectable} from '@angular/core';
+ 
+@Injectable()
+export class ConfigService {
+    private authtoken: string = '';
+    constructor(private http: HttpClient, private url: string) {
+        this.url = url;
+    }
+    public postAccess(object: object): any {
+    //console.log(this.http.post(this.url, JSON.stringify(object)));
+        const myHeaders = new HttpHeaders().set('Authorization', this.authtoken);
+        return this.http.post(this.url, JSON.stringify(object), {headers:myHeaders});
+    }
+}
+*/
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+interface BoardButtonsBuilder {
+    setBoardButtonsUrl(): void;
+    setBoardButtonsCallback(): void;
+}
+
+class BoardButtonBuilder implements BoardButtonsBuilder {
+    private product!: setBoardButtons;
+
+    constructor() {
+        this.reset();
+    }
+
+    public reset(): void {
+        this.product = new setBoardButtons();
+    }
+
+    public setBoardButtonsUrl(): void {
+        this.product.parts[0].url = 'https://legalitgroup.com/poslugi-it-yuristiv/';
+        this.product.parts[0].target = 'Inspiring Boards';
+    }
+
+    public setBoardButtonsCallback(): void {
+        this.product.parts[0].callback = this.BoardButtonsCallback;
+    }
+
+    public getProduct(): setBoardButtons {
+        const result = this.product;
+        this.reset();
+        console.log(result);
+        return result;
+    }
+
+    public BoardButtonsCallback(): void{
+        alert("MMM,nice");
+    }
+}
+
+export interface BoardButtonHeart{
+    icon: object;
+    text: string;
+    condition: string;
+    [key: string]: any;
+}
+
+class setBoardButtons {
+    public parts: BoardButtonHeart[];
+    constructor(){
+        this.parts = [{
+            icon: {
+                dark: "https://example.com/a-white-icon.png",
+                light: "https://example.com/a-black-icon.png"
+            },
+            text: 'by Legal IT Group',
+            condition: 'always'
+        }];
+    }
+}
+
+export class BoardButtonDirector {
+    private builder!: BoardButtonsBuilder;
+
+    public setBuilder(builder: BoardButtonsBuilder): void {
+        this.builder = builder;
+    }
+
+    public buildWithUrl(): void {
+        this.builder.setBoardButtonsUrl();
+    }
+
+    public buildWithCallback(): void {
+        this.builder.setBoardButtonsCallback();
+    }
+}
+
+export function BoardButtonSwitcher(director: BoardButtonDirector, condition: boolean) : any {
+    const builder = new BoardButtonBuilder();
+    director.setBuilder(builder);
+
+    switch(condition){
+        case (true):
+            director.buildWithCallback();
+            break;
+        case (false):
+            director.buildWithUrl();
+            break;
+    }
+    return builder.getProduct();
+}

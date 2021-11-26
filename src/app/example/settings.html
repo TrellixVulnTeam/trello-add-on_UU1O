@@ -1,0 +1,189 @@
+<html>
+
+  <head>
+
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+
+    <style>
+
+      select { height: 30px; }
+
+    </style>
+
+    <script src="https://p.trellocdn.com/power-up.min.js" crossorigin="anonymous"></script>
+
+  </head>
+
+  <body style="
+scrollbar-3d-light-color: #c8e0f7;
+scrollbar-arrow-color: black;
+scrollbar-dark-shadow-color: black;
+scrollbar-face-color: #98bde0;
+scrollbar-highlight-color: #b6d1eb;
+scrollbar-shadow-color: #6c8dab;
+scrollbar-track-color: #e7eaec;
+" onload="">
+
+    <script src="../js/settings.js"></script>
+
+  </body>
+
+</html>
+
+<!--
+// add adder scripts files to google drive from google init form
+// add section customize functions
+
+// .nvmrc
+v12
+
+// setting.html forms v1 
+-->
+
+<!-- if not load - then run register and autorun config form and then run config -->
+
+    <form id="login" style="visibility: hidden;">
+
+      <label for="by Legal.IT.Group">Register board:</label>
+
+      
+
+      <button type="submit" class="mod-primary">Send</button>
+
+      <button type="" class="mod-primary">Remember</button>
+
+    </form>
+
+    <!-- if loaded then config -->
+
+    <form id="config" style="visibility: hidden;">
+
+      <label for="by Legal.IT.Group">Settings:</label>
+
+      
+
+      <button type="submit" class="mod-primary">Save</button>
+
+      <button type="" class="mod-primary">Scripts</button>
+
+    </form>
+
+    <form id="googlein" style="visibility: hidden;">
+
+    <!-- updates sector that we access -->
+
+      <label for="by Legal.IT.Group">Edit or setup project scripts:</label>
+
+      
+
+      <button type="submit" class="mod-primary">Upload</button>
+
+    </form>
+
+
+<!-- 
+    // settings html forms v2
+-->
+
+<form action="..src/startFormSubmit.js" autocomplete="on" id="startForm">//target="_parent"
+
+	<fieldset>
+    
+    	<legend>Your settings</legend>
+
+			<button name="registerButton" id="registerButton" type="submit" formtarget="_parent">
+
+				<input type="checkbox" id="register" name="register">
+ 
+ 				<label for="register">Register</label>
+
+			</button>  
+
+			<button name="configurationButton" id="configurationButton" type="submit" formtarget="_parent">
+
+				<input type="checkbox" id="configuration" name="configuration">
+ 
+ 				<label for="configuration">Configuration</label>
+
+			</button>  
+
+			<button name="googleinButton" id="googleinButton" type="submit" formtarget="_parent">
+
+				<input type="checkbox" id="googlein" name="googlein">
+ 
+ 				<label for="googlein">Drive</label>
+
+			</button> 
+
+			<br>
+
+			<button name="scriptsButton" id="scriptsButton" type="submit" formtarget="_parent">
+
+				<input type="checkbox" id="scripts" name="scripts">
+ 
+ 				<label for="scripts">Scripts</label>
+
+			</button>	
+
+			<button name="uploadButton" id="uploadButton" type="submit" formtarget="_parent">
+
+				<input type="checkbox" id="upload" name="upload">
+ 
+ 				<label for="upload">Upload</label>
+
+			</button>
+
+			<button name="reportButton" id="reportButton" type="submit" formtarget="_parent">
+
+				<input type="checkbox" id="report" name="report">
+ 
+ 				<label for="report">Report</label>
+
+			</button>	
+
+            <!--
+			//checked //.addEventListener('click', updateDisplay); //.checked
+			//autofocus //disabled
+            -->
+
+  </fieldset>
+
+  <fieldset>
+    
+    	<legend>Your settings</legend>
+
+    		<a href="">
+
+    			<input type="image" id="website" alt="Website" src=""  width="50" height="50">
+
+    		</a>
+
+    		<a href="">
+
+    			<input type="image" id="facebook" alt="Facebook" src=""  width="50" height="50">
+
+    		</a>
+
+    		<br>
+
+    		<button name="aboutButton" id="aboutButton" type="submit" formtarget="_self">
+
+				About us
+
+			</button>
+
+	</fieldset>
+
+</form>
+
+
+<div class="shadow">&nbsp;</div> 
+    
+    
+<img src="images\foto3.jpg" class="gal" style="margin-top: 280px; margin-left: 750px;" width="160px" height="110px" onclick="gallery(this.src)">
+
+<div id="dark" onclick="document.getElementById('dark').style.display='none';">
+<div style="width: 100%; text-align: center; z-index: 4;">
+<img src="" id="pic_src" style="z-index: 5;">
+</div>
+</div>
