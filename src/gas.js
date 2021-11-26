@@ -2,7 +2,7 @@ class Telegram {
 
     constructor( ){
        
-      this.token = '1812139977:AAFHTtXoNPoOgD1Lc9fLrUHp084cl_VoSJE';
+      this.token = 'TOKEN';
       
       this.url = 'https://api.telegram.org/bot' + this.token + "/sendMessage";
       
